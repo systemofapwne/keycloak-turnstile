@@ -11,23 +11,19 @@ import org.keycloak.provider.ProviderConfigProperty
 import org.keycloak.services.validation.Validation
 
 class ResetCredentialsTurnstile : ResetCredentialChooseUser() {
-
     companion object {
         const val PROVIDER_ID = "rescreds-user-turnstile"
         const val DEFAULT_ACTION = "login-reset-credentials"
         private val REQUIREMENT_CHOICES = arrayOf(AuthenticationExecutionModel.Requirement.REQUIRED)
     }
 
-    private var config: Turnstile.Configuration? = null
-    private var lang: String? = null
-
     override fun authenticate(context: AuthenticationFlowContext) {
         val form = context.form()
 
         context.event.detail("auth_method", "reset_credentials_turnstile")
 
-        val configuration = Turnstile.readConfig(context.authenticatorConfig.config, DEFAULT_ACTION)
-        if (configuration == null) {
+        val config = Turnstile.readConfig(context.authenticatorConfig.config, DEFAULT_ACTION)
+        if (config == null) {
             form.addError(FormMessage(null, Turnstile.MSG_CAPTCHA_NOT_CONFIGURED))
             context.failureChallenge(
                 AuthenticationFlowError.INVALID_CREDENTIALS,
@@ -36,11 +32,8 @@ class ResetCredentialsTurnstile : ResetCredentialChooseUser() {
             return
         }
 
-        val language = context.session.context.resolveLocale(context.user).toLanguageTag()
-        Turnstile.prepareForm(form, configuration, language)
-
-        config = configuration
-        lang = language
+        val lang = context.session.context.resolveLocale(context.user).toLanguageTag()
+        Turnstile.prepareForm(form, config, lang)
 
         super.authenticate(context)
     }
@@ -51,8 +44,8 @@ class ResetCredentialsTurnstile : ResetCredentialChooseUser() {
 
         context.event.detail("auth_method", "reset_credentials_turnstile")
 
-        val configuration = Turnstile.readConfig(context.authenticatorConfig.config, DEFAULT_ACTION)
-        if (configuration == null) {
+        val config = Turnstile.readConfig(context.authenticatorConfig.config, DEFAULT_ACTION)
+        if (config == null) {
             context.failureChallenge(
                 AuthenticationFlowError.INVALID_CREDENTIALS,
                 challenge(context, Turnstile.MSG_CAPTCHA_NOT_CONFIGURED)
@@ -62,18 +55,15 @@ class ResetCredentialsTurnstile : ResetCredentialChooseUser() {
 
         if (Validation.isBlank(captcha) ||
             !Turnstile.validate(
-                configuration,
+                config,
                 captcha,
                 context.connection.remoteAddr,
                 context.session.getProvider(HttpClientProvider::class.java).httpClient
             )
         ) {
 
-            val language = context.session.context.resolveLocale(context.user).toLanguageTag()
-            Turnstile.prepareForm(context.form(), configuration, language)
-
-            config = configuration
-            lang = language
+            val lang = context.session.context.resolveLocale(context.user).toLanguageTag()
+            Turnstile.prepareForm(context.form(), config, lang)
 
             formData.remove(Turnstile.CF_TURNSTILE_RESPONSE)
             context.failureChallenge(
