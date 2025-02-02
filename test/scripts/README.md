@@ -27,3 +27,13 @@ Set registration flow, and change turnstile config (if setting turnstile registr
 
 #### Switch to turnstile registration flow, and set turnstile config:
 > npx tsx setRegistrationFlow.ts registration-turnstile client-visible-pass-server-pass
+
+## Reset Credential Flows
+Set reset credentials flow, and change turnstile config (if setting turnstile reset credentials flow)
+> npx tsx setResetCredentialsFlow.ts [flow alias] [turnstile-config]
+
+#### Switch to default reset credentials flow:
+> npx tsx setResetCredentialsFlow.ts reset-credentials
+
+#### Switch to turnstile reset credentials flow, and set turnstile config:
+> npx tsx setResetCredentialsFlow.ts reset-credentials-turnstile client-visible-pass-server-pass

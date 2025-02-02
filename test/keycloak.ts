@@ -32,6 +32,7 @@ export async function getAuthedClient() {
 
 export type BrowserAuthFlow = 'browser' | 'browser-turnstile';
 export type RegistrationAuthFlow = 'registration' | 'registration-turnstile';
+export type ResetCredentialsAuthFlow = 'reset credentials' | 'reset credentials-turnstile';
 
 type TurnstileConfig = {
     'site.key'?: string,
@@ -105,6 +106,33 @@ export async function setRegistrationAuthBinding(
     );
 }
 
+export async function setResetCredentialsAuthBinding(
+    client: KcAdminClient,
+    realm: string,
+    flowName: ResetCredentialsAuthFlow
+) {
+    await client.realms.update(
+        { realm },
+        {
+            resetCredentialsFlow: flowName
+        }
+    );
+}
+
+export async function setResetCredentialsAllowed(
+    client: KcAdminClient,
+    realm: string,
+    allowed: boolean
+) {
+
+    await client.realms.update(
+        { realm },
+        {
+            resetPasswordAllowed: allowed
+        }
+    );
+}
+
 export async function setRegistrationAllowed(
     client: KcAdminClient,
     realm: string,
@@ -146,7 +174,7 @@ async function setExecutionConfig(
                 'Authorization': `Bearer ${client.accessToken}`
             },
             body: JSON.stringify({
-                alias,
+                alias: `${alias}-${executionId}`,
                 config
             })
         }
@@ -191,6 +219,26 @@ export async function setRegistrationFlowTurnstileConfig(
     await setExecutionConfig(
         client, realm,
         registrationFlowTurnstileExecutionId,
+        configAlias,
+        authConfig
+    );
+}
+
+
+export async function setResetCredentialsFlowTurnstileConfig(
+    client: KcAdminClient,
+    realm: string,
+    config: TurnstileAuthenticatorConfig) {
+    const resetCredentialsFlowTurnstileExecutionId = await getFlowExecutionId(client, 'reset credentials-turnstile', 'rescreds-user-turnstile');
+    if (resetCredentialsFlowTurnstileExecutionId === undefined) throw new Error('Reset credentials flow turnstile execution id not found');
+
+    const isConfigPreset = isTurnstileAuthenticatorConfigPreset(config);
+    const configAlias = isConfigPreset ? `turnstile-preset-${config}` : `turnstile-custom`;
+    const authConfig = isConfigPreset ? turnstileConfigs[config] : config;
+
+    await setExecutionConfig(
+        client, realm,
+        resetCredentialsFlowTurnstileExecutionId,
         configAlias,
         authConfig
     );

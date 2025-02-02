@@ -101,6 +101,25 @@ Or you could check out the [theme](./theme) directory and modify it to your need
 
 ```
 
+```diff
+--- login-reset-password-base.ftl
++++ login-reset-password.ftl
+@@ -17,6 +17,13 @@
+                     </#if>
+                 </div>
+             </div>
++            <#if captchaRequired??>
++                <div class="${properties.kcFormGroupClass!}">
++                    <div class="${properties.kcInputWrapperClass!}">
++                        <div class="cf-turnstile" data-sitekey="${captchaSiteKey}" data-action="${captchaAction}" data-language="${captchaLanguage}"></div>
++                    </div>
++                </div>
++            </#if>
+             <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
+                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
+                     <div class="${properties.kcFormOptionsWrapperClass!}">
+```
+
 ### Running E2E Playwright tests (requires Docker)
 
 The playwright tests can either be run inside a docker container, or directly.  In either case, the keycloak container must be running in order for the tests to have something to connect to.

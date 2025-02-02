@@ -23,6 +23,8 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+    depends_on:
+      - mailhog
 
   playwright:
     build:
@@ -42,3 +44,10 @@ services:
     volumes:
       - ./test:/app
     command: ["npx", "playwright", "test"]
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    ports:
+      - "8025:8025"  # Webmail port
+      - "1025:1025"  # SMTP port
