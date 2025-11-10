@@ -9,7 +9,7 @@ import org.keycloak.models.utils.FormMessage
 import org.keycloak.services.validation.Validation
 import org.keycloak.models.KeycloakSession
 
-class LoginTurnstile(session: KeycloakSession?) : UsernamePasswordForm() {
+class LoginTurnstile(session: KeycloakSession?) : UsernamePasswordForm(session) {
     companion object {
         const val DEFAULT_ACTION = "login"
     }
