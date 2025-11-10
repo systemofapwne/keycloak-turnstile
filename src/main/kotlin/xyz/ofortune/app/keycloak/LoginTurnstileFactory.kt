@@ -13,11 +13,10 @@ import org.keycloak.provider.ProviderConfigProperty
 class LoginTurnstileFactory : UsernamePasswordFormFactory() {
     companion object {
         const val PROVIDER_ID = "login-turnstile-action"
-        private val SINGLETON: UsernamePasswordForm = LoginTurnstile()
     }
 
     override fun create(session: KeycloakSession?): Authenticator {
-        return SINGLETON
+        return LoginTurnstile(session)
     }
 
     override fun init(config: Config.Scope?) {

@@ -7,8 +7,9 @@ import org.keycloak.connections.httpclient.HttpClientProvider
 import org.keycloak.events.Details
 import org.keycloak.models.utils.FormMessage
 import org.keycloak.services.validation.Validation
+import org.keycloak.models.KeycloakSession
 
-class LoginTurnstile : UsernamePasswordForm() {
+class LoginTurnstile(session: KeycloakSession?) : UsernamePasswordForm() {
     companion object {
         const val DEFAULT_ACTION = "login"
     }
