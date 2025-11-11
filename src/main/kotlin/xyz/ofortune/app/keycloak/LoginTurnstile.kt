@@ -1,5 +1,6 @@
 package xyz.ofortune.app.keycloak
 
+import org.keycloak.WebAuthnConstants;
 import org.keycloak.authentication.AuthenticationFlowContext
 import org.keycloak.authentication.AuthenticationFlowError
 import org.keycloak.authentication.authenticators.browser.UsernamePasswordForm
@@ -46,7 +47,12 @@ class LoginTurnstile(session: KeycloakSession?) : UsernamePasswordForm(session) 
             return
         }
 
-        if (Validation.isBlank(captcha) || !Turnstile.validate(
+        if (webauthnAuth != null && webauthnAuth.isPasskeysEnabled()
+                && (formData.containsKey(WebAuthnConstants.AUTHENTICATOR_DATA) || formData.containsKey(WebAuthnConstants.ERROR))) {
+            // webauth form submission, try to action using the webauthn authenticator
+            webauthnAuth.action(context);
+            return;
+        } else  if (Validation.isBlank(captcha) || !Turnstile.validate(
                 config,
                 captcha,
                 context.connection.remoteAddr,
